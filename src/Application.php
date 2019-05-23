@@ -15,17 +15,33 @@ class Application extends SilexApplication
     {
         parent::__construct($values);
 
+        $this->configureServices();
+        $this->createDBTables();
+        $this->configureControllers();
+    }
+
+    /**
+     * Config app options and register services.
+     */
+    private function configureServices()
+    {
         $this['debug'] = true;
 
         $this->register(new TwigServiceProvider(), [
             'twig.path' => __DIR__.'/../views',
-        ]);
+        ]);    
+               
+    }
 
+    private function createDBTables(){
         // Database configuration
         $this->register(new DoctrineServiceProvider(), [
             'db.options' => [
-                'driver' => 'pdo_sqlite',
-                'path' => __DIR__.'/../database/app.db',
+                'dbname' => 'silex',
+                'user' => 'root',
+                'password' => '',
+                'host' => 'localhost',
+                'driver' => 'pdo_mysql',
             ],
         ]);
 
@@ -46,8 +62,11 @@ class Application extends SilexApplication
                 payingMethod VARCHAR(10) NOT NULL
             );");
         }
+        
+    }
 
-        $this->get('/bookings/create', function () {
+    private function configureControllers(){
+         $this->get('/bookings/create', function () {
             return $this['twig']->render('base.html.twig');
         });
     }
